@@ -231,7 +231,7 @@ export default function HomePage() {
             </div>
 
             {/* Right — Hero image */}
-            <div className="relative hidden lg:flex items-center justify-center">
+            <div className="relative flex items-center justify-center">
               <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-3xl scale-90" />
               <img
                 src="/hero-section.jpeg"
