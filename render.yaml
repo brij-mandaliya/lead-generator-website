@@ -9,8 +9,18 @@ services:
         value: 8080
       - key: NODE_ENV
         value: production
-      - key: DATABASE_URL
+      - key: DB_HOST
         sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_PORT
+        value: 5432
+      - key: DB_SSL
+        value: "true"
       - key: SESSION_SECRET
         sync: false
       - key: FRONTEND_URL
@@ -21,6 +31,10 @@ services:
         sync: false
       - key: GOOGLE_CALLBACK_URL
         sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_EMAIL
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_KEY
+        sync: false
       - key: RAZORPAY_ENVIRONMENT
         value: test
       - key: RAZORPAY_KEY_ID_TEST
@@ -29,6 +43,24 @@ services:
         sync: false
       - key: RAZORPAY_WEBHOOK_SECRET_TEST
         sync: false
+      - key: RAZORPAY_KEY_ID_LIVE
+        sync: false
+      - key: RAZORPAY_KEY_SECRET_LIVE
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET_LIVE
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: LOG_LEVEL
+        value: info
 
   - type: web
     name: leadforge-frontend
