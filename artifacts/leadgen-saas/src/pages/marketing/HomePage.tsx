@@ -367,64 +367,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Pricing Preview ───────────────────────────────────── */}
-      {plans && plans.length > 0 && (
-        <section className="py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-14">
-              <Badge variant="secondary" className="mb-4 text-primary border-primary/30 bg-primary/10">Pricing</Badge>
-              <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">Simple, Transparent Pricing</h2>
-              <p className="text-muted-foreground text-lg">No hidden fees. Cancel anytime.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {plans.slice(0, 3).map((plan, idx) => {
-                const isPopular = idx === 1;
-                return (
-                  <div
-                    key={plan.id}
-                    className={`relative p-7 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${
-                      isPopular
-                        ? "border-primary/50 bg-primary/5 shadow-lg shadow-primary/10"
-                        : "border-border/50 bg-card hover:border-primary/30"
-                    }`}
-                  >
-                    {isPopular && (
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                        <span className="gradient-primary text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Most Popular</span>
-                      </div>
-                    )}
-                    <h3 className="font-bold text-lg mb-1">{plan.name}</h3>
-                    <div className="flex items-end gap-1 mb-1">
-                      <span className="text-4xl font-black">${plan.price}</span>
-                      <span className="text-sm text-muted-foreground mb-1">/mo</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mb-6 pb-6 border-b border-border/40">
-                      {plan.leadsPerDay} leads per day
-                    </div>
-                    <ul className="space-y-3 mb-8">
-                      {(plan.features || []).map((f) => (
-                        <li key={f} className="flex items-start gap-2.5 text-sm">
-                          <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Link href="/register">
-                      <Button
-                        className={`w-full h-11 font-semibold ${isPopular ? "gradient-primary text-white border-0" : ""}`}
-                        variant={isPopular ? "default" : "outline"}
-                      >
-                        Get Started
-                        <ArrowRight className="ml-2 w-4 h-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── Final CTA ────────────────────────────────────────── */}
       <section className="py-24 bg-card/20 border-t border-border/50">
