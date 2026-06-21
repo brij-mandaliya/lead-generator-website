@@ -1,25 +1,15 @@
 FROM node:24-alpine
-WORKDIR /app
 
+WORKDIR /app
 RUN corepack enable
 
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY tsconfig.base.json tsconfig.json ./
-
-COPY lib/db/package.json ./lib/db/
-COPY lib/api-zod/package.json ./lib/api-zod/
-COPY lib/google-sheets/package.json ./lib/google-sheets/
-COPY lib/api-client-react/package.json ./lib/api-client-react/
-COPY lib/api-spec/package.json ./lib/api-spec/
-COPY artifacts/api-server/package.json ./artifacts/api-server/
-COPY artifacts/leadgen-saas/package.json ./artifacts/leadgen-saas/
-COPY scripts/package.json ./scripts/
-
-RUN pnpm install --no-frozen-lockfile
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json tsconfig.json ./
 
 COPY lib ./lib
 COPY artifacts ./artifacts
 COPY scripts ./scripts
+
+RUN pnpm install --no-frozen-lockfile
 
 RUN pnpm --filter @workspace/api-server run build
 

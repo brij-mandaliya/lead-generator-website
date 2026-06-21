@@ -1,0 +1,11 @@
+node_modules
+.git
+.gitignore
+.env
+.env*
+*.md
+LICENSE
+artifacts/*/node_modules
+lib/*/node_modules
+lib/*/dist
+artifacts/*/dist
