@@ -188,7 +188,7 @@ const FormCard = ({
         variant="outline"
         className="w-full h-11 transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
         data-testid="button-google"
-        onClick={() => { window.location.href = "/api/auth/google"; }}
+        onClick={() => { window.location.href = `${import.meta.env.VITE_API_URL || ""}/api/auth/google`; }}
       >
         <svg className="w-5 h-5 mr-2 shrink-0" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
