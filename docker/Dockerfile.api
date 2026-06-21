@@ -6,7 +6,7 @@ WORKDIR /app
 RUN corepack enable
 
 # Copy only manifest files first — this layer caches as long as dependencies don't change
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY tsconfig.base.json tsconfig.json ./
 
 # Copy all workspace package.json manifests so pnpm can resolve symlinks
