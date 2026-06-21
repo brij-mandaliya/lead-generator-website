@@ -5,10 +5,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useGetDashboardSummary, useListPlans } from "@workspace/api-client-react";
+import { useListPlans } from "@workspace/api-client-react";
 import { useEffect, useRef, useState } from "react";
 import MarketingLayout from "@/components/layouts/MarketingLayout";
-import { useAuthStore } from "@/lib/auth";
 
 function useCountUp(target: number, duration = 2000) {
   const [count, setCount] = useState(0);
@@ -160,24 +159,8 @@ const testimonials = [
   },
 ];
 
-const MOCK_LEADS = [
-  { name: "TechFlow Solutions", budget: "$5K–10K", country: "US", person: "Sarah Chen", status: "new", intent: true, score: 94 },
-  { name: "GrowthHQ Agency", budget: "$2K–5K", country: "UK", person: "James Wilson", status: "contacted", intent: false, score: 78 },
-  { name: "NovaSaaS", budget: "$10K+", country: "CA", person: "Priya Patel", status: "closed", intent: true, score: 97 },
-  { name: "Apex Digital", budget: "$3K–7K", country: "AU", person: "Mike Chen", status: "new", intent: true, score: 88 },
-];
-
-const STATUS_STYLE: Record<string, string> = {
-  new: "bg-muted/60 text-muted-foreground",
-  contacted: "bg-blue-500/15 text-blue-400",
-  closed: "bg-green-500/15 text-green-400",
-};
-
 export default function HomePage() {
-  const { user } = useAuthStore();
-  const { data: summary } = useGetDashboardSummary({ query: { enabled: !!user } });
   const { data: plans } = useListPlans();
-  const [activeRow, setActiveRow] = useState<number | null>(null);
 
   return (
     <MarketingLayout>
@@ -247,95 +230,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right — interactive dashboard mockup */}
-            <div className="relative hidden lg:block">
-              {/* Glow behind card */}
+            {/* Right — Hero image */}
+            <div className="relative hidden lg:flex items-center justify-center">
               <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-3xl scale-90" />
-
-              <div className="relative rounded-2xl border border-border/60 bg-card shadow-2xl overflow-hidden">
-                {/* Window chrome */}
-                <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border/50 bg-muted/20">
-                  <div className="w-3 h-3 rounded-full bg-red-400/70" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400/70" />
-                  <div className="w-3 h-3 rounded-full bg-green-400/70" />
-                  <span className="ml-3 text-xs text-muted-foreground font-mono">prospecthive.app/dashboard</span>
-                  <span className="ml-auto flex items-center gap-1 text-xs text-green-400 font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" />
-                    Live
-                  </span>
-                </div>
-
-                {/* Stat row */}
-                <div className="grid grid-cols-2 gap-3 p-5 pb-3">
-                  {[
-                    { label: "Total Leads", value: summary ? (summary.totalLeads || 1240).toLocaleString() : "1,240", color: "text-primary", bg: "bg-primary/8 border-primary/20" },
-                    { label: "New Today", value: summary ? (summary.newLeadsToday || 24) : 24, color: "text-amber-400", bg: "bg-amber-500/8 border-amber-500/20" },
-                  ].map((s) => (
-                    <div key={s.label} className={`rounded-xl p-4 border ${s.bg}`}>
-                      <div className="text-xs text-muted-foreground mb-1">{s.label}</div>
-                      <div className={`text-2xl font-black ${s.color} stat-counter`}>{s.value}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Leads table */}
-                <div className="px-5 pb-5">
-                  <div className="rounded-xl border border-border/40 overflow-hidden">
-                    <div className="px-4 py-2.5 bg-muted/20 border-b border-border/30 flex items-center justify-between">
-                      <span className="text-xs font-semibold text-muted-foreground">Recent Leads</span>
-                      <span className="text-xs text-primary font-medium cursor-pointer hover:underline">View all →</span>
-                    </div>
-                    {MOCK_LEADS.map((lead, i) => (
-                      <div
-                        key={i}
-                        className={`flex items-center gap-3 px-4 py-3 border-b border-border/20 last:border-0 cursor-pointer transition-colors duration-150 ${activeRow === i ? "bg-primary/5" : "hover:bg-secondary/30"}`}
-                        onMouseEnter={() => setActiveRow(i)}
-                        onMouseLeave={() => setActiveRow(null)}
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                          <Target className="w-3.5 h-3.5 text-primary" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium truncate">{lead.name}</div>
-                          <div className="text-xs text-muted-foreground">{lead.budget} · {lead.country}</div>
-                        </div>
-                        {lead.intent && (
-                          <span className="text-xs bg-primary/12 text-primary px-2 py-0.5 rounded-full border border-primary/20 font-medium shrink-0">
-                            High Intent
-                          </span>
-                        )}
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs font-bold text-primary">{lead.score}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLE[lead.status]}`}>
-                            {lead.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating badge */}
-              <div className="absolute -bottom-4 -left-4 bg-card border border-green-500/30 rounded-xl px-4 py-3 shadow-lg flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-green-500/15 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-green-400" />
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground">Close rate this week</div>
-                  <div className="text-sm font-bold text-green-400">+34% ↑</div>
-                </div>
-              </div>
-
-              <div className="absolute -top-4 -right-4 bg-card border border-primary/30 rounded-xl px-4 py-3 shadow-lg flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground">Leads added today</div>
-                  <div className="text-sm font-bold text-primary">{summary?.newLeadsToday ?? 24} new</div>
-                </div>
-              </div>
+              <img
+                src="/hero-section.jpeg"
+                alt="ProspectHive Dashboard Preview"
+                className="relative w-full h-auto rounded-2xl border border-border/60 shadow-2xl object-cover"
+              />
             </div>
           </div>
         </div>
