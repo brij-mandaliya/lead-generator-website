@@ -1,5 +1,4 @@
 import app from "./app";
-import { runMigrations } from "@workspace/db/migrate";
 import { initializeGoogleSheetsService } from "@workspace/google-sheets";
 import { initializeEmailService } from "./lib/email";
 import { logger } from "./lib/logger";
@@ -19,9 +18,6 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 async function start() {
-  await runMigrations();
-  logger.info("Migrations complete");
-
   await initializeGoogleSheetsService().catch((err) => {
     logger.error({ err }, "Google Sheets service init failed — sheets disabled");
   });
