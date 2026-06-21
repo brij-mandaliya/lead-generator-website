@@ -8,10 +8,10 @@ import MarketingLayout from "@/components/layouts/MarketingLayout";
 import { formatPrice } from "@/lib/utils";
 
 const faqs = [
-  { q: "Can I upgrade or downgrade at any time?", a: "Yes. You can change your plan at any time and the billing difference is prorated." },
-  { q: "How are leads delivered?", a: "Leads are delivered to your dashboard daily based on your plan's daily limit." },
-  { q: "What makes a lead 'high-intent'?", a: "We analyze behavioral signals — recent search activity, platform posts, job listings — to flag prospects actively looking for solutions." },
-  { q: "Do I need a credit card to start?", a: "You can create an account and explore the platform for free. Payment is required to receive leads." },
+  { q: "How do you ensure the leads are accurate?", a: "We verify contact information through multiple sources and quality checks before delivery. Our goal is to provide reliable data that helps you connect with the right prospects." },
+  { q: "Can you target leads based on my specific industry or niche?", a: "Yes. We build lead lists based on your target market, industry, location, company size, and other criteria to ensure relevance." },
+  { q: "Do you provide contact details like email addresses and phone numbers?", a: "Yes. Depending on availability, we provide verified business emails, phone numbers, company information, and other relevant prospect details." },
+  { q: "What makes your lead generation service different from buying a lead list?", a: "Unlike generic lead lists, our leads are researched and filtered according to your business goals, helping you focus on prospects that are more likely to be relevant." },
 ];
 
 export default function PricingPage() {
