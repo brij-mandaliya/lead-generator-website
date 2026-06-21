@@ -1,4 +1,4 @@
-FROM node:24-alpine AS deps
+FROM node:24-alpine
 WORKDIR /app
 
 RUN corepack enable
@@ -17,33 +17,15 @@ COPY scripts/package.json ./scripts/
 
 RUN pnpm install --no-frozen-lockfile
 
-FROM deps AS builder
 COPY lib ./lib
 COPY artifacts ./artifacts
 COPY scripts ./scripts
+
 RUN pnpm --filter @workspace/api-server run build
-
-FROM node:24-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-COPY --from=deps /app/package.json /app/pnpm-workspace.yaml /app/pnpm-lock.yaml ./
-
-COPY --from=deps /app/lib/db/package.json ./lib/db/
-COPY --from=deps /app/lib/api-zod/package.json ./lib/api-zod/
-COPY --from=deps /app/lib/google-sheets/package.json ./lib/google-sheets/
-COPY --from=deps /app/artifacts/api-server/package.json ./artifacts/api-server/
-COPY --from=deps /app/scripts/package.json ./scripts/
-
-COPY --from=builder /app/artifacts/api-server/dist /app/artifacts/api-server/dist
-
-RUN pnpm install --no-frozen-lockfile --prod
 
 COPY docker/start-api.sh /usr/local/bin/start-api.sh
 RUN chmod +x /usr/local/bin/start-api.sh
 
-WORKDIR /app/artifacts/api-server
 EXPOSE 8080
 
 CMD ["start-api.sh"]
