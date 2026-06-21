@@ -16,6 +16,8 @@ RUN pnpm --filter @workspace/api-server run build
 COPY docker/start-api.sh /usr/local/bin/start-api.sh
 RUN chmod +x /usr/local/bin/start-api.sh
 
+WORKDIR /app/artifacts/api-server
+
 EXPOSE 8080
 
 CMD ["start-api.sh"]
