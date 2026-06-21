@@ -20,7 +20,6 @@ COPY lib/api-client-react/package.json ./lib/api-client-react/
 COPY lib/api-spec/package.json ./lib/api-spec/
 COPY artifacts/api-server/package.json ./artifacts/api-server/
 COPY artifacts/leadgen-saas/package.json ./artifacts/leadgen-saas/
-COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
 COPY scripts/package.json ./scripts/
 
 RUN pnpm install --no-frozen-lockfile
