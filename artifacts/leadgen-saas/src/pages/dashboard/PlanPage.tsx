@@ -8,6 +8,8 @@ import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { formatPrice } from "@/lib/utils";
 import { loadRazorpayScript, showRazorpayCheckout } from "@/lib/razorpay";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 export default function PlanPage() {
   const { toast } = useToast();
   const { data: plans, isLoading: plansLoading } = useListPlans();
@@ -25,14 +27,14 @@ export default function PlanPage() {
       });
 
       // 1. Get Razorpay key from backend
-      const keyResponse = await fetch('/api/payments/key');
+      const keyResponse = await fetch(`${API_BASE}/api/payments/key`);
       if (!keyResponse.ok) {
         throw new Error('Failed to get Razorpay key');
       }
       const { key } = await keyResponse.json();
       
       // 2. Create order via backend
-      const orderResponse = await fetch('/api/payments/create-order', {
+      const orderResponse = await fetch(`${API_BASE}/api/payments/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ planId: plan.id })
@@ -53,7 +55,7 @@ export default function PlanPage() {
         order_id: order.id,
         handler: async (response) => {
           // Payment successful - verify with backend
-          const verifyResponse = await fetch('/api/payments/verify', {
+          const verifyResponse = await fetch(`${API_BASE}/api/payments/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -3,7 +3,6 @@ import {
   Target, Eye, Quote, Star, ArrowRight,
   Users, Zap, Globe, Shield,
   BarChart3, Sparkles, ChevronRight,
-  Linkedin, Twitter, Mail,
   Building2, TrendingUp, Award,
 } from "lucide-react";
 import { Link } from "wouter";
@@ -100,13 +99,6 @@ const values = [
     color: "from-rose-500/30 to-rose-500/10 border-rose-500/30",
     iconBg: "bg-rose-500/15 text-rose-400",
   },
-];
-
-const team = [
-  { name: "Alex Chen", role: "CEO & Co-Founder", initials: "AC", color: "from-primary/30 to-primary/10" },
-  { name: "Maya Rodriguez", role: "CTO & Co-Founder", initials: "MR", color: "from-purple-500/30 to-purple-500/10" },
-  { name: "David Kim", role: "VP of Engineering", initials: "DK", color: "from-amber-500/30 to-amber-500/10" },
-  { name: "Sarah Okafor", role: "Head of Data Science", initials: "SO", color: "from-blue-500/30 to-blue-500/10" },
 ];
 
 const reviews = [
@@ -442,53 +434,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Meet the Team ────────────────────────────────────── */}
-      <section className="py-24 bg-card/20 border-y border-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4 text-primary border-primary/30 bg-primary/10 px-4 py-1.5">
-              Leadership
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">
-              Meet the <span className="gradient-text">Team</span>
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              A passionate group of builders, data scientists, and growth experts working to transform lead generation.
-            </p>
-          </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {team.map((member) => (
-              <div
-                key={member.name}
-                className="group relative p-6 rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm hover:-translate-y-1 transition-all duration-500 text-center"
-              >
-                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${member.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                <div className="relative">
-                  <Avatar className="w-20 h-20 mx-auto mb-4 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
-                    <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-primary/30 to-primary/10 text-primary">
-                      {member.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <h3 className="font-bold text-base">{member.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{member.role}</p>
-                  <div className="flex justify-center gap-3">
-                    <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                      <Linkedin className="w-4 h-4" />
-                    </a>
-                    <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                      <Twitter className="w-4 h-4" />
-                    </a>
-                    <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                      <Mail className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── Reviews ─────────────────────────────────────────── */}
       <section className="py-24">
