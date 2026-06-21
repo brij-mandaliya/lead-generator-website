@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: leadforge-api
+    env: docker
+    dockerfilePath: ./docker/Dockerfile.api-render
+    healthCheckPath: /api/healthz
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: RAZORPAY_ENVIRONMENT
+        value: test
+      - key: RAZORPAY_KEY_ID_TEST
+        sync: false
+      - key: RAZORPAY_KEY_SECRET_TEST
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET_TEST
+        sync: false
+
+  - type: web
+    name: leadforge-frontend
+    env: docker
+    dockerfilePath: ./docker/Dockerfile.frontend-render
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 80
+      - key: BASE_PATH
+        value: /
+      - key: API_URL
+        sync: false

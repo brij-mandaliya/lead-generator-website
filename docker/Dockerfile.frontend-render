@@ -1,0 +1,43 @@
+FROM node:24-alpine AS deps
+WORKDIR /app
+
+RUN corepack enable
+
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
+COPY tsconfig.base.json tsconfig.json ./
+
+COPY lib/db/package.json ./lib/db/
+COPY lib/api-zod/package.json ./lib/api-zod/
+COPY lib/google-sheets/package.json ./lib/google-sheets/
+COPY lib/api-client-react/package.json ./lib/api-client-react/
+COPY lib/api-spec/package.json ./lib/api-spec/
+COPY artifacts/api-server/package.json ./artifacts/api-server/
+COPY artifacts/leadgen-saas/package.json ./artifacts/leadgen-saas/
+COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
+COPY scripts/package.json ./scripts/
+
+RUN pnpm install --no-frozen-lockfile
+
+FROM deps AS builder
+COPY lib ./lib
+COPY artifacts ./artifacts
+COPY scripts ./scripts
+RUN pnpm --filter @workspace/leadgen-saas run build
+
+FROM nginx:1.27-alpine AS runner
+
+RUN apk add --no-cache gettext
+
+COPY docker/start-frontend.sh /usr/local/bin/start-frontend.sh
+RUN chmod +x /usr/local/bin/start-frontend.sh
+
+COPY docker/nginx-render.conf /etc/nginx/conf.d/default.conf.template
+
+COPY --from=builder /app/artifacts/leadgen-saas/dist/public /usr/share/nginx/html
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD wget -q --spider http://localhost/ || exit 1
+
+CMD ["start-frontend.sh"]

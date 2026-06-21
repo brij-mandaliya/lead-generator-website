@@ -1,0 +1,50 @@
+networks:
+  leadforge:
+    external: true
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: leadforge-api
+    networks:
+      - leadforge
+    restart: unless-stopped
+    environment:
+      DB_HOST: ${DB_HOST:-leadforge-db}
+      DB_USER: ${DB_USER:-leadforge}
+      DB_PASS: ${DB_PASS:-leadforge}
+      DB_DATABASE: ${DB_DATABASE:-leadforge}
+      DB_PORT: ${DB_PORT:-5432}
+      SESSION_SECRET: ${SESSION_SECRET:-dev-secret-key-change-me-in-production}
+      PORT: "8080"
+      NODE_ENV: production
+    expose:
+      - "8080"
+    # `node:24-alpine` has no `wget`/`curl`, so probe via Node's built-in `http`.
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "node -e \"require('http').get('http://127.0.0.1:8080/api/healthz', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+      args:
+        BASE_PATH: ${BASE_PATH:-/}
+    container_name: leadforge-frontend
+    networks:
+      - leadforge
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+

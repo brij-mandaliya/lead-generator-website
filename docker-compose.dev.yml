@@ -1,0 +1,82 @@
+# Development override for docker-compose.yml
+# Enables hot-reload for both frontend and API.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+networks:
+  leadforge:
+    external: true
+
+services:
+  api:
+    container_name: leadforge-api-dev
+    environment:
+      NODE_ENV: development
+      # Pin DB env vars explicitly so host env doesn't leak in
+      DB_HOST: leadforge-db
+      DB_USER: leadforge
+      DB_PASS: leadforge
+      DB_DATABASE: leadforge
+      DB_PORT: "5432"
+    command:
+      - sh
+      - -c
+      - "corepack enable && pnpm --filter @workspace/db run migrate && pnpm --filter @workspace/api-server run dev:watch"
+    volumes:
+      # Mount source code so tsx watch can detect changes and restart.
+      - ./artifacts/api-server/src:/app/artifacts/api-server/src
+      - ./artifacts/api-server/build.mjs:/app/artifacts/api-server/build.mjs
+      - ./artifacts/api-server/package.json:/app/artifacts/api-server/package.json
+      - ./artifacts/api-server/tsconfig.json:/app/artifacts/api-server/tsconfig.json
+      # Shared workspace libraries
+      - ./lib/db/src:/app/lib/db/src
+      - ./lib/db/package.json:/app/lib/db/package.json
+      - ./lib/db/tsconfig.json:/app/lib/db/tsconfig.json
+      - ./lib/db/drizzle.config.ts:/app/lib/db/drizzle.config.ts
+      - ./lib/api-zod/src:/app/lib/api-zod/src
+      - ./lib/api-zod/package.json:/app/lib/api-zod/package.json
+      - ./lib/api-zod/tsconfig.json:/app/lib/api-zod/tsconfig.json
+      - ./lib/api-client-react/src:/app/lib/api-client-react/src
+      - ./lib/api-client-react/package.json:/app/lib/api-client-react/package.json
+      - ./lib/api-client-react/tsconfig.json:/app/lib/api-client-react/tsconfig.json
+      # Workspace config files (for pnpm workspace resolution)
+      - ./package.json:/app/package.json
+      - ./pnpm-workspace.yaml:/app/pnpm-workspace.yaml
+      - ./tsconfig.base.json:/app/tsconfig.base.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./.npmrc:/app/.npmrc
+
+  frontend:
+    container_name: leadforge-frontend-dev
+    build:
+      target: deps  # stop at deps stage (no nginx build) for dev
+    environment:
+      NODE_ENV: development
+      PORT: "5173"
+      BASE_PATH: ${BASE_PATH:-/}
+      API_PROXY_TARGET: ${API_PROXY_TARGET:-http://api:8080}
+    ports:
+      - "${FRONTEND_DEV_PORT:-5173}:5173"
+    depends_on:
+      api:
+        condition: service_started
+    command: ["sh", "-c", "corepack enable && pnpm --filter @workspace/leadgen-saas run dev"]
+    volumes:
+      # Mount source code so Vite HMR can reload on changes.
+      - ./artifacts/leadgen-saas/src:/app/artifacts/leadgen-saas/src
+      - ./artifacts/leadgen-saas/index.html:/app/artifacts/leadgen-saas/index.html
+      - ./artifacts/leadgen-saas/vite.config.ts:/app/artifacts/leadgen-saas/vite.config.ts
+      - ./artifacts/leadgen-saas/package.json:/app/artifacts/leadgen-saas/package.json
+      - ./artifacts/leadgen-saas/tsconfig.json:/app/artifacts/leadgen-saas/tsconfig.json
+      - ./artifacts/leadgen-saas/public:/app/artifacts/leadgen-saas/public
+      # Shared workspace libraries
+      - ./lib/api-client-react/src:/app/lib/api-client-react/src
+      - ./lib/api-client-react/package.json:/app/lib/api-client-react/package.json
+      - ./lib/api-client-react/tsconfig.json:/app/lib/api-client-react/tsconfig.json
+      - ./lib/api-zod/src:/app/lib/api-zod/src
+      - ./lib/api-zod/package.json:/app/lib/api-zod/package.json
+      - ./lib/api-zod/tsconfig.json:/app/lib/api-zod/tsconfig.json
+      # Workspace config files
+      - ./package.json:/app/package.json
+      - ./pnpm-workspace.yaml:/app/pnpm-workspace.yaml
+      - ./tsconfig.base.json:/app/tsconfig.base.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./.npmrc:/app/.npmrc

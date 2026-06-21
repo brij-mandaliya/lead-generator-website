@@ -1,0 +1,1038 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: LeadGen SaaS Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: users
+    description: User management
+  - name: leads
+    description: Lead management
+  - name: plans
+    description: Subscription plan management
+  - name: payments
+    description: Payment history
+  - name: analytics
+    description: Analytics and reporting
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # AUTH
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout user
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # USERS
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users (admin only)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, all]
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersPage"
+
+  /users/{userId}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{userId}/status:
+    patch:
+      operationId: updateUserStatus
+      tags: [users]
+      summary: Activate or deactivate a user (admin only)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserStatusBody"
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{userId}/plan:
+    patch:
+      operationId: assignUserPlan
+      tags: [users]
+      summary: Assign a plan to user (admin only)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignPlanBody"
+      responses:
+        "200":
+          description: Plan assigned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # LEADS
+  /leads:
+    get:
+      operationId: listLeads
+      tags: [leads]
+      summary: List leads accessible to the current user
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: companyName
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [new, contacted, closed, all]
+        - name: source
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of leads
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeadsPage"
+    post:
+      operationId: createLead
+      tags: [leads]
+      summary: Create a new lead (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLeadBody"
+      responses:
+        "201":
+          description: Lead created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+
+  /leads/{leadId}:
+    get:
+      operationId: getLead
+      tags: [leads]
+      summary: Get lead details
+      parameters:
+        - name: leadId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lead details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+    patch:
+      operationId: updateLead
+      tags: [leads]
+      summary: Update a lead (admin only)
+      parameters:
+        - name: leadId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLeadBody"
+      responses:
+        "200":
+          description: Updated lead
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+    delete:
+      operationId: deleteLead
+      tags: [leads]
+      summary: Delete a lead (admin only)
+      parameters:
+        - name: leadId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lead deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /leads/{leadId}/status:
+    patch:
+      operationId: updateLeadStatus
+      tags: [leads]
+      summary: Update lead status for the current user
+      parameters:
+        - name: leadId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLeadStatusBody"
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserLead"
+
+  /leads/{leadId}/notes:
+    patch:
+      operationId: updateLeadNotes
+      tags: [leads]
+      summary: Update notes for a lead
+      parameters:
+        - name: leadId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLeadNotesBody"
+      responses:
+        "200":
+          description: Notes updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserLead"
+
+  # PLANS
+  /plans:
+    get:
+      operationId: listPlans
+      tags: [plans]
+      summary: List all subscription plans
+      responses:
+        "200":
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plan"
+    post:
+      operationId: createPlan
+      tags: [plans]
+      summary: Create a new plan (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePlanBody"
+      responses:
+        "201":
+          description: Plan created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Plan"
+
+  /plans/{planId}:
+    patch:
+      operationId: updatePlan
+      tags: [plans]
+      summary: Update a plan (admin only)
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePlanBody"
+      responses:
+        "200":
+          description: Updated plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Plan"
+    delete:
+      operationId: deletePlan
+      tags: [plans]
+      summary: Delete a plan (admin only)
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Plan deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # PAYMENTS
+  /payments:
+    get:
+      operationId: listPayments
+      tags: [payments]
+      summary: List payment history for the current user (or all users for admin)
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Payment history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentsPage"
+
+  # ANALYTICS / WOW ENDPOINTS
+  /analytics/dashboard:
+    get:
+      operationId: getDashboardSummary
+      tags: [analytics]
+      summary: Get dashboard summary stats for the current user
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /analytics/admin:
+    get:
+      operationId: getAdminAnalytics
+      tags: [analytics]
+      summary: Get admin-level analytics (admin only)
+      responses:
+        "200":
+          description: Admin analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAnalytics"
+
+  /analytics/leads-by-country:
+    get:
+      operationId: getLeadsByCountry
+      tags: [analytics]
+      summary: Get lead counts grouped by country
+      responses:
+        "200":
+          description: Leads grouped by country
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CountryCount"
+
+  /analytics/leads-by-status:
+    get:
+      operationId: getLeadsByStatus
+      tags: [analytics]
+      summary: Get lead counts grouped by status for the current user
+      responses:
+        "200":
+          description: Leads grouped by status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StatusCount"
+
+  /analytics/recent-leads:
+    get:
+      operationId: getRecentLeads
+      tags: [analytics]
+      summary: Get most recently added leads
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: Recent leads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lead"
+
+  /analytics/revenue-by-month:
+    get:
+      operationId: getRevenueByMonth
+      tags: [analytics]
+      summary: Get revenue aggregated by month (admin only)
+      responses:
+        "200":
+          description: Monthly revenue data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyRevenue"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    # AUTH
+    RegisterBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        company:
+          type: string
+        phone:
+          type: string
+      required: [name, email, password]
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required: [user, token]
+
+    # USER
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        company:
+          type: string
+          nullable: true
+        services:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [user, admin]
+        isActive:
+          type: boolean
+        planId:
+          type: integer
+          nullable: true
+        plan:
+          $ref: "#/components/schemas/Plan"
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, email, role, isActive, createdAt]
+
+    UsersPage:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [users, total, page, limit]
+
+    UpdateUserBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        services:
+          type: string
+
+    UpdateUserStatusBody:
+      type: object
+      properties:
+        isActive:
+          type: boolean
+      required: [isActive]
+
+    AssignPlanBody:
+      type: object
+      properties:
+        planId:
+          type: integer
+      required: [planId]
+
+    # PLAN
+    Plan:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+        currency:
+          type: string
+          enum: [INR, USD]
+        leadsPerDay:
+          type: integer
+        features:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, price, currency, leadsPerDay, features, isActive, createdAt]
+
+    CreatePlanBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        currency:
+          type: string
+          enum: [INR, USD]
+        leadsPerDay:
+          type: integer
+        features:
+          type: array
+          items:
+            type: string
+      required: [name, price, currency, leadsPerDay, features]
+
+    UpdatePlanBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        currency:
+          type: string
+          enum: [INR, USD]
+        leadsPerDay:
+          type: integer
+        features:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+
+    # LEAD
+    Lead:
+      type: object
+      properties:
+        id:
+          type: integer
+        companyName:
+          type: string
+        url:
+          type: string
+          nullable: true
+        leadDescription:
+          type: string
+        personName:
+          type: string
+          nullable: true
+        website:
+          type: string
+          nullable: true
+        phoneNumber:
+          type: string
+          nullable: true
+        linkedinUrl:
+          type: string
+          nullable: true
+        userStatus:
+          type: string
+          enum: [new, contacted, closed]
+          nullable: true
+        userNotes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, companyName, leadDescription, createdAt, updatedAt]
+
+    LeadsPage:
+      type: object
+      properties:
+        leads:
+          type: array
+          items:
+            $ref: "#/components/schemas/Lead"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [leads, total, page, limit]
+
+    CreateLeadBody:
+      type: object
+      properties:
+        companyName:
+          type: string
+        url:
+          type: string
+        leadDescription:
+          type: string
+        personName:
+          type: string
+        website:
+          type: string
+        phoneNumber:
+          type: string
+        linkedinUrl:
+          type: string
+      required: [companyName, leadDescription]
+
+    UpdateLeadBody:
+      type: object
+      properties:
+        companyName:
+          type: string
+        url:
+          type: string
+        leadDescription:
+          type: string
+        personName:
+          type: string
+        website:
+          type: string
+        phoneNumber:
+          type: string
+        linkedinUrl:
+          type: string
+
+    UpdateLeadStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, contacted, closed]
+      required: [status]
+
+    UpdateLeadNotesBody:
+      type: object
+      properties:
+        notes:
+          type: string
+      required: [notes]
+
+    UserLead:
+      type: object
+      properties:
+        userId:
+          type: integer
+        leadId:
+          type: integer
+        status:
+          type: string
+          enum: [new, contacted, closed]
+        notes:
+          type: string
+          nullable: true
+      required: [userId, leadId, status]
+
+    # PAYMENT
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        amount:
+          type: number
+        currency:
+          type: string
+          enum: [INR, USD]
+        status:
+          type: string
+          enum: [pending, completed, failed]
+        planId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, userId, amount, currency, status, createdAt]
+
+    PaymentsPage:
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [payments, total, page, limit]
+
+    # ANALYTICS
+    DashboardSummary:
+      type: object
+      properties:
+        totalLeads:
+          type: integer
+        newLeadsToday:
+          type: integer
+        contactedLeads:
+          type: integer
+        closedLeads:
+          type: integer
+        conversionRate:
+          type: number
+        planName:
+          type: string
+          nullable: true
+        leadsPerDay:
+          type: integer
+          nullable: true
+      required: [totalLeads, newLeadsToday, contactedLeads, closedLeads, conversionRate]
+
+    AdminAnalytics:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        activeUsers:
+          type: integer
+        totalLeads:
+          type: integer
+        totalRevenue:
+          type: number
+        newUsersThisMonth:
+          type: integer
+        newLeadsThisMonth:
+          type: integer
+        revenueThisMonth:
+          type: number
+      required: [totalUsers, activeUsers, totalLeads, totalRevenue, newUsersThisMonth, newLeadsThisMonth, revenueThisMonth]
+
+    CountryCount:
+      type: object
+      properties:
+        country:
+          type: string
+        count:
+          type: integer
+      required: [country, count]
+
+    StatusCount:
+      type: object
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+      required: [status, count]
+
+    MonthlyRevenue:
+      type: object
+      properties:
+        month:
+          type: string
+        revenue:
+          type: number
+        payments:
+          type: integer
+      required: [month, revenue, payments]

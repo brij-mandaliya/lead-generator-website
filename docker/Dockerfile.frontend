@@ -1,0 +1,48 @@
+# Frontend — multi-stage build
+# Stage 1: install workspace deps
+FROM node:24-alpine AS deps
+WORKDIR /app
+
+RUN corepack enable
+
+ARG BASE_PATH=/
+ENV BASE_PATH=$BASE_PATH
+
+# Copy only manifest files first — this layer caches as long as dependencies don't change
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
+COPY tsconfig.base.json tsconfig.json ./
+
+# Copy all workspace package.json manifests so pnpm can resolve symlinks
+COPY lib/db/package.json ./lib/db/
+COPY lib/api-zod/package.json ./lib/api-zod/
+COPY lib/google-sheets/package.json ./lib/google-sheets/
+COPY lib/api-client-react/package.json ./lib/api-client-react/
+COPY lib/api-spec/package.json ./lib/api-spec/
+COPY artifacts/api-server/package.json ./artifacts/api-server/
+COPY artifacts/leadgen-saas/package.json ./artifacts/leadgen-saas/
+COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
+COPY scripts/package.json ./scripts/
+
+RUN pnpm install --no-frozen-lockfile
+
+# ── Builder ───────────────────────────────────────────────────────────
+FROM deps AS builder
+# Copy actual source code (this busts the cache on code changes, but deps layer is cached)
+COPY lib ./lib
+COPY artifacts ./artifacts
+WORKDIR /app/artifacts/leadgen-saas
+RUN pnpm run build
+
+# ── Runtime ───────────────────────────────────────────────────────────
+FROM nginx:1.27-alpine AS runner
+
+# Replace the default nginx site with ours (SPA fallback + /api proxy).
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the static build output.
+COPY --from=builder /app/artifacts/leadgen-saas/dist/public /usr/share/nginx/html
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD wget -q --spider http://127.0.0.1/ || exit 1

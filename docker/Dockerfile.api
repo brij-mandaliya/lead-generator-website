@@ -1,0 +1,65 @@
+# API server — multi-stage build
+# Stage 1: install workspace deps
+FROM node:24-alpine AS deps
+WORKDIR /app
+
+RUN corepack enable
+
+# Copy only manifest files first — this layer caches as long as dependencies don't change
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
+COPY tsconfig.base.json tsconfig.json ./
+
+# Copy all workspace package.json manifests so pnpm can resolve symlinks
+COPY lib/db/package.json ./lib/db/
+COPY lib/api-zod/package.json ./lib/api-zod/
+COPY lib/google-sheets/package.json ./lib/google-sheets/
+COPY lib/api-client-react/package.json ./lib/api-client-react/
+COPY lib/api-spec/package.json ./lib/api-spec/
+COPY artifacts/api-server/package.json ./artifacts/api-server/
+COPY artifacts/leadgen-saas/package.json ./artifacts/leadgen-saas/
+COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
+COPY scripts/package.json ./scripts/
+
+RUN pnpm install --no-frozen-lockfile
+
+# ── Builder ───────────────────────────────────────────────────────────
+FROM deps AS builder
+# Copy actual source code (this busts the cache on code changes, but deps layer is cached)
+COPY lib ./lib
+COPY artifacts ./artifacts
+COPY scripts ./scripts
+WORKDIR /app/artifacts/api-server
+RUN pnpm run build
+
+# ── Runtime ───────────────────────────────────────────────────────────
+FROM node:24-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+RUN corepack enable
+
+# Copy workspace manifests needed for pnpm --prod pruning
+COPY --from=deps /app/package.json /app/pnpm-workspace.yaml /app/pnpm-lock.yaml ./
+
+# Copy only the package.json files for workspace packages (source is bundled into dist)
+COPY --from=deps /app/lib/db/package.json ./lib/db/
+COPY --from=deps /app/lib/api-zod/package.json ./lib/api-zod/
+COPY --from=deps /app/lib/google-sheets/package.json ./lib/google-sheets/
+COPY --from=deps /app/artifacts/api-server/package.json ./artifacts/api-server/
+COPY --from=deps /app/scripts/package.json ./scripts/
+
+# Copy node_modules (full dependency tree)
+COPY --from=deps /app/node_modules /app/node_modules
+
+# Copy built dist (workspace source is bundled, external deps remain in node_modules)
+COPY --from=builder /app/artifacts/api-server/dist /app/artifacts/api-server/dist
+
+# Trim dev dependencies to shrink the image
+RUN pnpm install --no-frozen-lockfile --prod
+
+WORKDIR /app/artifacts/api-server
+EXPOSE 8080
+
+USER node
+
+CMD ["sh", "-c", "node --enable-source-maps ./dist/index.mjs"]
