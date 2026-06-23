@@ -54,8 +54,8 @@ function AnimatedStat({ value, suffix = "", label }: { value: number; suffix?: s
 const features = [
   {
     icon: Zap,
-    title: "AI-Powered Scoring",
-    desc: "Every lead is scored by intent signals so your team focuses only on the ones most likely to close.",
+    title: "Email Outreach",
+    desc: "Cookie-cutter templates get ignored. We write outreach that sounds like a human wrote it - because we did. Personalised, sequenced, and built to get replies.",
     color: "text-amber-400",
     bg: "bg-amber-500/10",
     border: "border-amber-500/20",
@@ -73,7 +73,7 @@ const features = [
   {
     icon: BarChart3,
     title: "Real-Time Dashboard",
-    desc: "Live stats, conversion tracking, and pipeline health — all in one beautifully simple place.",
+    desc: "Live stats, conversion tracking, and pipeline health, all in one beautifully simple place.",
     color: "text-blue-400",
     bg: "bg-blue-500/10",
     border: "border-blue-500/20",
@@ -202,21 +202,20 @@ export default function HomePage() {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
-                The{" "}
-                <span className="gradient-text">Lead Machine</span>
+                We{" "}
+                <span className="gradient-text">Fill Your Pipeline</span>
                 <br />
-                <span className="text-foreground">Built for Closers</span>
+                <span className="text-foreground">You Close the Deals.</span>
               </h1>
 
               <p className="text-lg text-muted-foreground leading-relaxed mb-8 max-w-lg">
-                Stop hunting leads manually. ProspectHive delivers high-intent, niche-targeted prospects
-                straight to your dashboard every day — so your team can focus on closing.
+                ProspectHive helps agencies and B2B teams build a steady stream of qualified leads - through sharp outreach, targeted prospecting, and strategy that actually converts.
               </p>
 
               <div className="flex flex-wrap gap-3 mb-10">
                 <Link href="/register">
                   <Button size="lg" className="gradient-primary text-white border-0 glow-sm h-12 px-8 text-base font-semibold group" data-testid="hero-cta-primary">
-                    Start Generating Leads
+                    Book a Free Strategy Call
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </Button>
                 </Link>
@@ -387,16 +386,16 @@ export default function HomePage() {
 
             <Badge variant="secondary" className="mb-6 text-primary border-primary/30 bg-primary/10">Get Started Today</Badge>
             <h2 className="text-3xl md:text-5xl font-black mb-5 relative tracking-tight">
-              Ready to Fill Your Pipeline?
+              Ready to stop chasing leads and start closing them?
             </h2>
             <p className="text-muted-foreground mb-10 max-w-xl mx-auto text-lg relative leading-relaxed">
-              Join 1,200+ agencies and founders who wake up to fresh leads every morning.
-              No hunting. No cold lists. Just warm, verified prospects.
+              Join 210+ agencies who've handed us the hard part - and watched their
+              pipelines grow.
             </p>
             <div className="flex flex-wrap gap-4 justify-center relative">
-              <Link href="/register">
+              <Link href="/contact">
                 <Button size="lg" className="gradient-primary text-white border-0 glow-sm h-13 px-10 text-base font-semibold group" data-testid="cta-final">
-                  Start Generating Leads Free
+                    Let's Talk → Free 30-Min Call
                   <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
