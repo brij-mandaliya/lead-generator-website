@@ -36,9 +36,7 @@ export default function ContactPage() {
             <div className="space-y-6">
               {[
                 { icon: Mail, label: "Email", value: "hello@prospecthive.app" },
-                { icon: MessageSquare, label: "Live Chat", value: "Available on dashboard" },
-                { icon: Clock, label: "Response Time", value: "Within 24 hours" },
-                { icon: MapPin, label: "Timezone", value: "UTC-5 (EST)" },
+                { icon: Clock, label: "Response Time", value: "Within 24 hours" }
               ].map((item) => {
                 const Icon = item.icon;
                 return (
@@ -53,12 +51,6 @@ export default function ContactPage() {
                   </div>
                 );
               })}
-            </div>
-
-            <div className="mt-10 p-6 rounded-xl border border-border/50 bg-card">
-              <h3 className="font-bold mb-2">Book a Strategy Call</h3>
-              <p className="text-sm text-muted-foreground mb-4">30-minute free session to map out your lead gen system.</p>
-              <Button variant="outline" className="w-full" data-testid="button-book-call">Schedule Call</Button>
             </div>
           </div>
 
