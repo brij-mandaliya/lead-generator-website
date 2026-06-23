@@ -16,7 +16,7 @@
 
 ## Manual End-to-End Testing (with Razorpay test credentials)
 - [ ] Start development servers (db, api-server, frontend)
-- [ ] Log in as test user (demo@leadforge.app / demo123)
+- [ ] Log in as test user (demo@prospecthive.app / demo123)
 - [ ] Navigate to plan upgrade/dashboard page
 - [ ] Select UPI payment option for a plan
 - [ ] Verify UPI payment button shows appropriate message/toast

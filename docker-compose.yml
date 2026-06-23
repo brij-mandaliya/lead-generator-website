@@ -1,5 +1,5 @@
 networks:
-  leadforge:
+  prospecthive:
     external: true
 
 services:
@@ -7,15 +7,15 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.api
-    container_name: leadforge-api
+    container_name: prospecthive-api
     networks:
-      - leadforge
+      - prospecthive
     restart: unless-stopped
     environment:
-      DB_HOST: ${DB_HOST:-leadforge-db}
-      DB_USER: ${DB_USER:-leadforge}
-      DB_PASS: ${DB_PASS:-leadforge}
-      DB_DATABASE: ${DB_DATABASE:-leadforge}
+      DB_HOST: ${DB_HOST:-prospecthive-db}
+      DB_USER: ${DB_USER:-prospecthive}
+      DB_PASS: ${DB_PASS:-prospecthive}
+      DB_DATABASE: ${DB_DATABASE:-prospecthive}
       DB_PORT: ${DB_PORT:-5432}
       SESSION_SECRET: ${SESSION_SECRET:-dev-secret-key-change-me-in-production}
       PORT: "8080"
@@ -38,9 +38,9 @@ services:
       dockerfile: docker/Dockerfile.frontend
       args:
         BASE_PATH: ${BASE_PATH:-/}
-    container_name: leadforge-frontend
+    container_name: prospecthive-frontend
     networks:
-      - leadforge
+      - prospecthive
     restart: unless-stopped
     depends_on:
       api:

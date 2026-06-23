@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: leadforge-api
+    name: prospecthive-api
     env: docker
     dockerfilePath: ./docker/Dockerfile.api-render
     healthCheckPath: /api/healthz
@@ -63,7 +63,7 @@ services:
         value: info
 
   - type: web
-    name: leadforge-frontend
+    name: prospecthive-frontend
     env: docker
     dockerfilePath: ./docker/Dockerfile.frontend-render
     healthCheckPath: /

@@ -55,31 +55,31 @@ async function seed() {
   console.log("Created plans: Starter (₹5,000), Growth (₹25,000)");
 
   // ── Admin user ─────────────────────────────────────────────────────
-  const [existingAdmin] = await db.select().from(usersTable).where(eq(usersTable.email, "admin@leadforge.app"));
+  const [existingAdmin] = await db.select().from(usersTable).where(eq(usersTable.email, "admin@prospecthive.app"));
   let adminUser: typeof usersTable.$inferSelect;
 
   if (!existingAdmin) {
     [adminUser] = await db.insert(usersTable).values({
       name: "Admin",
-      email: "admin@leadforge.app",
+      email: "admin@prospecthive.app",
       password: hashPassword("admin123"),
       role: "admin",
       isActive: true,
     }).returning();
-    console.log("Created admin: admin@leadforge.app / admin123");
+    console.log("Created admin: admin@prospecthive.app / admin123");
   } else {
     adminUser = existingAdmin;
     console.log("Admin already exists");
   }
 
   // ── Demo user ──────────────────────────────────────────────────────
-  const [existingDemo] = await db.select().from(usersTable).where(eq(usersTable.email, "demo@leadforge.app"));
+  const [existingDemo] = await db.select().from(usersTable).where(eq(usersTable.email, "demo@prospecthive.app"));
   let demoUser: typeof usersTable.$inferSelect;
 
   if (!existingDemo) {
     [demoUser] = await db.insert(usersTable).values({
       name: "Alex Johnson",
-      email: "demo@leadforge.app",
+      email: "demo@prospecthive.app",
       password: hashPassword("demo123"),
       role: "user",
       company: "Growth Agency",
@@ -87,11 +87,11 @@ async function seed() {
       planId: proPlan!.id,
       isActive: true,
     }).returning();
-    console.log("Created demo user: demo@leadforge.app / demo123");
+    console.log("Created demo user: demo@prospecthive.app / demo123");
   } else {
     demoUser = existingDemo;
     // Plans were just wiped, so re-assign the demo user to the new Growth plan
-    await db.update(usersTable).set({ planId: proPlan!.id }).where(eq(usersTable.email, "demo@leadforge.app"));
+    await db.update(usersTable).set({ planId: proPlan!.id }).where(eq(usersTable.email, "demo@prospecthive.app"));
     console.log("Demo user exists — re-assigned to Growth plan");
   }
 
@@ -148,8 +148,8 @@ async function seed() {
 
   console.log("\n✅ Seed complete!");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("Admin login:  admin@leadforge.app / admin123");
-  console.log("Demo login:   demo@leadforge.app  / demo123");
+  console.log("Admin login:  admin@prospecthive.app / admin123");
+  console.log("Demo login:   demo@prospecthive.app  / demo123");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
   process.exit(0);

@@ -2,19 +2,19 @@
 # Enables hot-reload for both frontend and API.
 # Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 networks:
-  leadforge:
+  prospecthive:
     external: true
 
 services:
   api:
-    container_name: leadforge-api-dev
+    container_name: prospecthive-api-dev
     environment:
       NODE_ENV: development
       # Pin DB env vars explicitly so host env doesn't leak in
-      DB_HOST: leadforge-db
-      DB_USER: leadforge
-      DB_PASS: leadforge
-      DB_DATABASE: leadforge
+      DB_HOST: prospecthive-db
+      DB_USER: prospecthive
+      DB_PASS: prospecthive
+      DB_DATABASE: prospecthive
       DB_PORT: "5432"
     command:
       - sh
@@ -45,7 +45,7 @@ services:
       - ./.npmrc:/app/.npmrc
 
   frontend:
-    container_name: leadforge-frontend-dev
+    container_name: prospecthive-frontend-dev
     build:
       target: deps  # stop at deps stage (no nginx build) for dev
     environment:

@@ -34,7 +34,7 @@ export default function AdminUsersPage() {
   const assignPlan = useAssignUserPlan();
 
   const allUsers = data?.users || [];
-  const users = allUsers.filter(user => user.email !== "admin@leadforge.app");
+  const users = allUsers.filter(user => user.email !== "admin@prospecthive.app");
   const total = data?.total || 0;
 
   const handleToggleStatus = (userId: number, isActive: boolean) => {
